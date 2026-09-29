@@ -11,15 +11,21 @@ Mod **Lawan Bot** dan **2 Pemain** jalan terus tanpa internet. Mod **Lawan Onlin
 {
   "rules": {
     "prochess_rooms": {
-      ".read": true,
+      ".read": "auth != null",
       ".indexOn": ["status"],
-      "$code": { ".write": true }
+      "$code": {
+        ".write": "auth != null",
+        ".validate": "$code.matches(/^[0-9]{4}$/)"
+      }
     }
   }
 }
 ```
 
 > **Guna projek Firebase sedia ada?** Boleh. Data ProChess disimpan di bawah `prochess_rooms`, jadi tak bercampur dengan app lain. Tapi **jangan ganti** rules yang sedia ada — cuma tambah blok `"prochess_rooms": {...}` di dalam `"rules"` bersama rules lama.
+
+## 1b. Hidupkan Anonymous sign-in
+**Build → Authentication → Get started → Sign-in method → Anonymous → Enable → Save.**
 
 ## 2. Ambil config
 1. **Project settings** (ikon gear) → **Your apps** → ikon **Web `</>`** → daftar app.

@@ -334,13 +334,13 @@ code{background:#0f1930;padding:2px 6px;border-radius:6px;font-size:12px}
    FIREBASE CONFIG (untuk mod online - Realtime Database)
    ========================================================= */
 const FIREBASE_CONFIG = {
-  apiKey: "",
-  authDomain: "",
-  databaseURL: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  apiKey: "AIzaSyAshtGsmVpGWbYb5LA5aCublkeaUS0up9Q",
+  authDomain: "prokuiz-aplikasi-b518a.firebaseapp.com",
+  databaseURL: "https://prokuiz-aplikasi-b518a-default-rtdb.asia-southeast1.firebasedatabase.app",  // <-- semak: salin dari halaman Realtime Database
+  projectId: "prokuiz-aplikasi-b518a",
+  storageBucket: "prokuiz-aplikasi-b518a.firebasestorage.app",
+  messagingSenderId: "93799126702",
+  appId: "1:93799126702:web:3ec4a612b709a95dc83f3f"
 };
 /* =========================================================
    AUTO UPDATE - nama repo GitHub app ini (username/repo)
@@ -556,7 +556,7 @@ ms:{vsBot:'Lawan Bot',vsBotSub:'3 level: Mudah, Sederhana, Sukar',online:'Lawan 
  nameLbl:'Nama pemain',quick:'Cari Lawan Rawak',quickSub:'Main dengan sesiapa yang sedang online',mkroom:'Cipta Bilik',mkroomSub:'Dapat kod 4 digit, kongsi dengan kawan',
  joinroom:'Masuk Bilik Kawan',joinSub:'Masukkan kod 4 digit daripada kawan',join:'Masuk',
  cfgTitle:'Online belum disetup',cfgSub:'Tampal firebaseConfig dari Firebase Console (Project settings → Your apps → Web app). Pastikan ada databaseURL.',cfgSave:'Simpan Config',cfgBad:'Config tidak sah — perlu apiKey & databaseURL',cfgSaved:'Config disimpan',cfgChange:'Tukar Firebase config',cfgFixed:'Config ditetapkan dalam kod app',
- connecting:'Menyambung ke server…',noNet:'Tiada internet atau config salah. Cuba lagi.',offline:'Tiada sambungan internet',creating:'Mencipta bilik…',createFail:'Gagal cipta bilik, cuba lagi.',joining:'Masuk bilik…',
+ connecting:'Menyambung ke server…',noNet:'Tiada internet atau config salah. Cuba lagi.',noAuth:'Gagal log masuk Firebase. Pastikan Anonymous sign-in di-enable.',offline:'Tiada sambungan internet',creating:'Mencipta bilik…',createFail:'Gagal cipta bilik, cuba lagi.',joining:'Masuk bilik…',
  noRoom:'Bilik {c} tidak wujud.',selfRoom:'Ini bilik anda sendiri.',fullRoom:'Bilik sudah penuh / sudah bermula.',searching:'Mencari lawan…',err:'Ralat',checkRules:'(semak Rules database)',
  yourCode:'Kod bilik anda',shareCode:'Kongsi kod ini dengan kawan anda. Permainan bermula bila lawan masuk.',seekSub:'Sila tunggu sebentar. Kawan juga boleh masuk guna kod di atas.',
  cancel:'Batal',cancelWait:'Batal Menunggu?',cancelWaitSub:'Bilik ini akan ditutup.',roomClosed:'Bilik telah ditutup',roomFull:'Bilik sudah penuh',youPlay:'Anda main sebagai {c}',
@@ -578,7 +578,7 @@ en:{vsBot:'Play vs Bot',vsBotSub:'3 levels: Easy, Medium, Hard',online:'Play Onl
  nameLbl:'Player name',quick:'Find Random Opponent',quickSub:'Play anyone who is online now',mkroom:'Create Room',mkroomSub:'Get a 4-digit code to share with a friend',
  joinroom:"Join Friend's Room",joinSub:'Enter the 4-digit code from your friend',join:'Join',
  cfgTitle:'Online not set up',cfgSub:'Paste firebaseConfig from Firebase Console (Project settings → Your apps → Web app). Make sure it has databaseURL.',cfgSave:'Save Config',cfgBad:'Invalid config — needs apiKey & databaseURL',cfgSaved:'Config saved',cfgChange:'Change Firebase config',cfgFixed:'Config is set inside the app code',
- connecting:'Connecting…',noNet:'No internet or wrong config. Try again.',offline:'No internet connection',creating:'Creating room…',createFail:'Could not create room, try again.',joining:'Joining room…',
+ connecting:'Connecting…',noNet:'No internet or wrong config. Try again.',noAuth:'Firebase sign-in failed. Enable Anonymous sign-in.',offline:'No internet connection',creating:'Creating room…',createFail:'Could not create room, try again.',joining:'Joining room…',
  noRoom:'Room {c} not found.',selfRoom:'This is your own room.',fullRoom:'Room is full / already started.',searching:'Finding opponent…',err:'Error',checkRules:'(check database Rules)',
  yourCode:'Your room code',shareCode:'Share this code with your friend. The game starts when they join.',seekSub:'Please wait. A friend can also join with the code above.',
  cancel:'Cancel',cancelWait:'Stop waiting?',cancelWaitSub:'This room will be closed.',roomClosed:'Room was closed',roomFull:'Room is full',youPlay:'You are playing {c}',
@@ -870,9 +870,14 @@ async function fbInit(){
     if(!window.firebase){
       await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
       await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js');
+      await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js');
     }
-    firebase.initializeApp(cfg);FB.db=firebase.database();$('onMsg').textContent='';return true;
+    if(!firebase.apps.length)firebase.initializeApp(cfg);
   }catch(e){$('onMsg').textContent=t('noNet');return false;}
+  try{ // log masuk tanpa nama (Anonymous) - sama macam ProSudoku
+    const auth=firebase.auth();if(!auth.currentUser)await auth.signInAnonymously();
+    FB.db=firebase.database();$('onMsg').textContent='';return true;
+  }catch(e){$('onMsg').textContent=t('noAuth')+' ('+(e.code||e.message)+')';return false;}
 }
 function needName(then){const n=store.get('name','');if(n)return n;askName(then);return null;}
 const rand4=()=>String(Math.floor(1000+Math.random()*9000));
