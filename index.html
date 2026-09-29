@@ -1,0 +1,1013 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0d1424">
+<title>ProChess by ProKuiz</title>
+<style>
+:root{
+  --bg:#0d1424; --bg2:#16213a; --card:#1c2947; --line:#2c3b60;
+  --gold:#f5b83d; --gold2:#ffd878; --txt:#eef2fb; --mut:#9aa8c7;
+  --light:#f0d9b5; --dark:#b07b4f; --green:#3ecf8e; --red:#ff5d5d;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overscroll-behavior:none;-webkit-user-select:none;user-select:none}
+body{background:radial-gradient(circle at 50% -10%,#24365f 0%,var(--bg) 55%) fixed}
+button{font:inherit;color:inherit;border:0;cursor:pointer}
+.sym{font-family:"Segoe UI Symbol","Noto Sans Symbols 2","DejaVu Sans",serif}
+.screen{display:none;min-height:100%;padding:18px 16px 28px;max-width:520px;margin:0 auto;flex-direction:column}
+.screen.active{display:flex}
+.center{align-items:center;justify-content:center;text-align:center}
+
+/* top bar home */
+.homeTop{display:flex;justify-content:space-between;align-items:center}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px}
+.seg button{flex:1;padding:9px 12px;border-radius:10px;background:transparent;font-weight:700;color:var(--mut)}
+.seg button.on{background:#2f4170;color:var(--txt)}
+.seg.big button{padding:12px 4px}
+.iconBtn{width:44px;height:44px;border-radius:13px;background:var(--card);border:1px solid var(--line);font-size:20px;display:grid;place-items:center}
+
+/* logo */
+.logo{display:flex;flex-direction:column;align-items:center;margin:18px 0 22px}
+.logo .emb{width:112px;height:112px;border-radius:30px;display:grid;place-items:center;
+  background:linear-gradient(145deg,#ffd878,#e0962a);box-shadow:0 12px 40px rgba(245,184,61,.35),inset 0 -6px 0 rgba(0,0,0,.15)}
+.logo .emb span{font-size:76px;line-height:1;color:#1b1206;margin-top:-6px}
+.logo h1{margin:14px 0 0;font-size:36px;letter-spacing:.5px;font-weight:800}
+.logo h1 b{color:var(--gold)}
+.logo small{color:var(--mut);font-size:13px;letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+
+.upd{display:none;align-items:center;gap:10px;padding:12px 14px;margin-top:12px;border-radius:16px;background:linear-gradient(135deg,rgba(62,207,142,.2),rgba(34,211,238,.2));border:1px solid rgba(62,207,142,.5);font-weight:700;font-size:14px;cursor:pointer}
+.upd.on{display:flex}
+.upd span{flex:1}
+.upd b{background:var(--green);color:#062b1c;padding:6px 12px;border-radius:10px}
+
+.btn{display:flex;align-items:center;gap:14px;width:100%;padding:16px 18px;border-radius:18px;margin:8px 0;
+  background:var(--card);border:1px solid var(--line);text-align:left;font-weight:700;font-size:17px;transition:transform .1s}
+.btn:active{transform:scale(.97)}
+.btn .ic{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:30px;flex:none}
+.btn .sub{display:block;font-weight:500;font-size:13px;color:var(--mut);margin-top:2px}
+.btn.gold{background:linear-gradient(135deg,#ffd878,#e8a12e);color:#1b1206;border:0}
+.btn.gold .sub{color:#4a3510}
+.btn.gold .ic{background:rgba(0,0,0,.12)}
+.ic.blue{background:#2b4a8a}.ic.green{background:#1f6b52}.ic.purple{background:#5b3a8a}
+.backbar{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:10px;padding:13px;border-radius:16px;background:var(--card);border:1px solid var(--line);font-weight:700;font-size:15px}
+.backbar:active{transform:scale(.97)}
+.backbar.exit{background:rgba(255,93,93,.12);border-color:rgba(255,93,93,.35);color:#ffd0d0}
+.primary{width:100%;padding:16px;border-radius:16px;background:linear-gradient(135deg,#ffd878,#e8a12e);color:#1b1206;font-weight:800;font-size:17px;margin-top:10px}
+.primary:disabled{opacity:.5}
+.ghost{width:100%;padding:14px;border-radius:16px;background:transparent;border:1px solid var(--line);color:var(--mut);font-weight:600;margin-top:10px}
+.head{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.head h2{margin:0;font-size:22px}
+.back{width:42px;height:42px;border-radius:12px;background:var(--card);border:1px solid var(--line);font-size:20px}
+.lbl{color:var(--mut);font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin:16px 0 8px}
+
+.lvl{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:16px;background:var(--card);border:2px solid var(--line);margin-bottom:10px;width:100%;text-align:left}
+.lvl.on{border-color:var(--gold);background:#27365c}
+.lvl .st{color:var(--gold);font-size:18px;min-width:62px;letter-spacing:2px}
+.lvl b{display:block;font-size:17px}
+.lvl small{color:var(--mut)}
+.lvl .rec{margin-left:auto;font-size:12px;color:var(--mut);text-align:right;white-space:nowrap}
+
+.nameChip{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:var(--card);border:1px solid var(--line);width:100%;text-align:left}
+.nameChip .av{background:#2f4170;color:var(--gold)}
+.nameChip b{flex:1;font-size:16px}
+.nameChip small{color:var(--mut);font-size:13px}
+
+input.inp,textarea.inp{width:100%;padding:14px 16px;border-radius:14px;background:#0f1930;border:1px solid var(--line);color:var(--txt);font-size:18px;outline:none;text-align:center;font-weight:700}
+textarea.inp{font-size:14px;text-align:left;font-weight:400;-webkit-user-select:text;user-select:text}
+input.inp[readonly]{caret-color:transparent;cursor:default}
+.code-inp{letter-spacing:14px;font-size:30px;font-weight:900;padding-left:28px}
+.note{font-size:13px;color:var(--mut);line-height:1.5}
+.box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:10px}
+
+/* in-app keyboard */
+.kb{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.kb .r{display:flex;gap:5px;justify-content:center}
+.kb button{flex:1;min-width:0;max-width:40px;height:44px;border-radius:10px;background:var(--card);border:1px solid var(--line);font-weight:700;font-size:16px}
+.kb button:active{background:var(--gold);color:#1b1206;transform:scale(.92)}
+.kb button.w{max-width:none;flex:2}
+.kb button.sp{max-width:none;flex:5}
+.kb button.ok{max-width:none;flex:2;background:linear-gradient(135deg,#ffd878,#e8a12e);color:#1b1206;border:none}
+.kb.num{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.kb.num button{max-width:none;height:56px;font-size:24px}
+
+/* settings */
+.set{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border-radius:16px;background:var(--card);border:1px solid var(--line);margin-bottom:10px;font-weight:600}
+.tog{width:52px;height:30px;border-radius:99px;background:#33415f;position:relative;flex:none;cursor:pointer;transition:.2s}
+.tog:after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on{background:var(--green)}.tog.on:after{left:25px}
+.chip{padding:9px 14px;border-radius:12px;background:#2f4170;font-weight:700;font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.stats div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center}
+.stats b{display:block;font-size:13px;color:var(--gold);margin-bottom:4px}
+.stats span{font-size:13px;color:var(--mut)}
+
+/* waiting */
+.bigcode{font-size:56px;font-weight:900;letter-spacing:14px;color:var(--gold);margin:10px 0 6px;padding-left:14px}
+.spin{width:46px;height:46px;border-radius:50%;border:4px solid var(--line);border-top-color:var(--gold);animation:sp 1s linear infinite;margin:24px auto}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* game */
+#game{padding:10px 10px 18px;gap:8px}
+.gtop{display:flex;align-items:center;gap:8px}
+.gtop .title{flex:1;text-align:center;font-weight:800;font-size:15px;color:var(--mut)}
+.gtop .title b{color:var(--gold)}
+.pbar{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:14px;background:var(--bg2);border:2px solid transparent;transition:border-color .2s}
+.pbar.turn{border-color:var(--gold);box-shadow:0 0 18px rgba(245,184,61,.2)}
+.av{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-size:26px;flex:none}
+.av.w{background:#f3f3f3;color:#222}.av.b{background:#222;color:#f3f3f3;border:1px solid #444}
+.pinfo{flex:1;min-width:0}
+.pname{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block}
+.dot.off{background:var(--red)}
+.caps{font-size:17px;color:var(--mut);min-height:20px;line-height:20px;white-space:nowrap;overflow:hidden}
+.caps em{font-style:normal;font-size:12px;font-family:system-ui,sans-serif;font-weight:700;color:var(--txt);margin-left:4px}
+.ptag{font-size:12px;font-weight:700;color:var(--gold)}
+
+.bwrap{position:relative;width:100%;aspect-ratio:1;border-radius:10px;overflow:hidden;
+  box-shadow:0 14px 40px rgba(0,0,0,.5),0 0 0 4px #3a2a1a,0 0 0 6px #6b4a2b}
+#board{display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);width:100%;height:100%}
+.sq{position:relative;display:grid;place-items:center;overflow:hidden}
+.sq.l{background:var(--light)}.sq.d{background:var(--dark)}
+.sq.last:after{content:"";position:absolute;inset:0;background:rgba(255,214,64,.42)}
+.sq.sel:after{content:"";position:absolute;inset:0;background:rgba(80,200,120,.55)}
+.sq.chk{background:radial-gradient(circle,#ff3b3b 0%,#e02020 35%,rgba(200,0,0,0) 75%),var(--dark)}
+.sq.l.chk{background:radial-gradient(circle,#ff3b3b 0%,#e02020 35%,rgba(200,0,0,0) 75%),var(--light)}
+.sq .mv{position:absolute;width:30%;height:30%;border-radius:50%;background:rgba(20,40,20,.35);z-index:2}
+.sq .cap{position:absolute;inset:4%;border-radius:50%;border:5px solid rgba(20,40,20,.35);z-index:2}
+.pc{position:relative;z-index:3;font-size:min(10.6vw,53px);line-height:1;
+  font-family:"Segoe UI Symbol","Noto Sans Symbols 2","DejaVu Sans","Arial Unicode MS",serif;pointer-events:none}
+.pc.w{color:#fffdf7;text-shadow:0 0 1px #000,0 0 1px #000,1px 1px 0 #1a1a1a,-1px -1px 0 #1a1a1a,1px -1px 0 #1a1a1a,-1px 1px 0 #1a1a1a,0 3px 4px rgba(0,0,0,.45)}
+.pc.b{color:#161616;text-shadow:0 0 1px #fff4,0 3px 4px rgba(0,0,0,.4)}
+.pc.pop{animation:pop .18s ease-out}
+@keyframes pop{from{transform:scale(.7)}to{transform:scale(1)}}
+.co{position:absolute;font-size:10px;font-weight:800;z-index:1;opacity:.75}
+.co.r{top:2px;left:3px}.co.f{bottom:1px;right:3px}
+.sq.l .co{color:var(--dark)}.sq.d .co{color:var(--light)}
+
+.status{text-align:center;font-size:14px;font-weight:700;color:var(--gold2);min-height:20px}
+.mlist{display:flex;gap:6px;overflow-x:auto;padding:4px 2px;font-size:13px;scrollbar-width:none;min-height:30px}
+.mlist::-webkit-scrollbar{display:none}
+.mlist span{white-space:nowrap;padding:4px 8px;background:var(--bg2);border-radius:8px;color:var(--mut)}
+.mlist span.cur{color:var(--txt);background:#2b3b63}
+.acts{display:flex;gap:8px}
+.acts button{flex:1;padding:12px 4px;border-radius:14px;background:var(--card);border:1px solid var(--line);font-weight:700;font-size:13px;display:flex;flex-direction:column;align-items:center;gap:3px}
+.acts button i{font-style:normal;font-size:20px}
+.acts button:disabled{opacity:.4}
+
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(5,9,20,.72);display:none;align-items:center;justify-content:center;z-index:50;padding:20px;backdrop-filter:blur(3px)}
+.modal.show{display:flex}
+.mbox{width:100%;max-width:380px;background:var(--bg2);border:1px solid var(--line);border-radius:22px;padding:22px;text-align:center;animation:mi .2s ease-out}
+@keyframes mi{from{transform:translateY(20px) scale(.95);opacity:0}}
+.mbox h3{margin:6px 0 6px;font-size:24px}
+.mbox p{color:var(--mut);margin:0 0 8px}
+.trophy{font-size:60px;line-height:1}
+.row2{display:flex;gap:10px;margin-top:12px}
+.row2 button{flex:1;margin:0}
+.promo{display:flex;gap:8px;justify-content:center;margin-top:12px}
+.promo button{width:64px;height:64px;border-radius:14px;background:var(--light);display:grid;place-items:center}
+.promo .pc{font-size:46px}
+.toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(30px);background:#000d;color:#fff;padding:12px 18px;border-radius:12px;font-size:14px;opacity:0;transition:.25s;z-index:60;max-width:90%;text-align:center;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.foot{margin-top:auto;padding-top:20px;text-align:center;color:var(--mut);font-size:12px}
+code{background:#0f1930;padding:2px 6px;border-radius:6px;font-size:12px}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div class="screen active" id="home">
+  <div class="homeTop">
+    <div class="seg"><button data-l="ms" onclick="setLang('ms')">BM</button><button data-l="en" onclick="setLang('en')">EN</button></div>
+    <button class="iconBtn" onclick="show('settings')" aria-label="Settings">⚙</button>
+  </div>
+  <div class="upd" id="updBar" onclick="openUpdate()">🚀 <span id="updTxt"></span><b data-t="updNow">Kemas Kini</b></div>
+  <div class="logo">
+    <div class="emb"><span class="sym">♞&#xFE0E;</span></div>
+    <h1>Pro<b>Chess</b></h1>
+    <small>by ProKuiz</small>
+  </div>
+  <button class="btn gold" onclick="show('botSetup')">
+    <span class="ic sym">♚&#xFE0E;</span><span><span data-t="vsBot">Lawan Bot</span><span class="sub" data-t="vsBotSub"></span></span>
+  </button>
+  <button class="btn" onclick="openOnline()">
+    <span class="ic blue sym">♛&#xFE0E;</span><span><span data-t="online">Lawan Online</span><span class="sub" data-t="onlineSub"></span></span>
+  </button>
+  <button class="btn" onclick="startLocal()">
+    <span class="ic green sym">♜&#xFE0E;</span><span><span data-t="local">2 Pemain</span><span class="sub" data-t="localSub"></span></span>
+  </button>
+  <button class="backbar exit" onclick="askExit()">⏻ <span data-t="exitBtn">Keluar App</span></button>
+  <div class="foot">ProChess by ProKuiz · <span class="verTxt"></span></div>
+</div>
+
+<!-- SETTINGS -->
+<div class="screen" id="settings">
+  <div class="head"><button class="back" onclick="handleBack()">‹</button><h2 data-t="set">Tetapan</h2></div>
+  <button class="nameChip" onclick="askName()"><span class="av sym">♚&#xFE0E;</span><span style="flex:1"><small data-t="nameLbl">Nama pemain</small><br><b id="sName">—</b></span><span>✎</span></button>
+  <div class="lbl" data-t="prefs">Pilihan</div>
+  <div class="set"><span data-t="lang">Bahasa</span><div class="seg"><button data-l="ms" onclick="setLang('ms')">BM</button><button data-l="en" onclick="setLang('en')">EN</button></div></div>
+  <div class="set"><span data-t="sound">Bunyi</span><div class="tog" id="tSound" onclick="toggleSet('sound')"></div></div>
+  <div class="set"><span data-t="vib">Getaran</span><div class="tog" id="tVib" onclick="toggleSet('vib')"></div></div>
+  <div class="set"><span data-t="showMoves">Tunjuk langkah sah</span><div class="tog" id="tMoves" onclick="toggleSet('moves')"></div></div>
+  <div class="lbl" data-t="botRec">Rekod lawan bot</div>
+  <div class="stats" id="myStats"></div>
+  <div class="set"><span><span data-t="version">Versi</span> <span class="verTxt" style="color:var(--mut)"></span></span><button class="chip" onclick="checkUpdate(true)" data-t="checkUpd">Semak Kemas Kini</button></div>
+  <button class="backbar" onclick="handleBack()">← <span data-t="back">Kembali</span></button>
+</div>
+
+<!-- BOT SETUP -->
+<div class="screen" id="botSetup">
+  <div class="head"><button class="back" onclick="handleBack()">‹</button><h2 data-t="vsBot">Lawan Bot</h2></div>
+  <div class="lbl" data-t="pickLvl">Pilih Level</div>
+  <div id="lvlList"></div>
+  <div class="lbl" data-t="playAs">Anda main sebagai</div>
+  <div class="seg big" id="colSeg">
+    <button data-c="w" class="on"><span class="sym">♔&#xFE0E;</span> <span data-t="white">Putih</span></button>
+    <button data-c="r" data-t="random">Rawak</button>
+    <button data-c="b"><span class="sym">♚&#xFE0E;</span> <span data-t="black">Hitam</span></button>
+  </div>
+  <button class="primary" style="margin-top:22px" onclick="startBot()" data-t="start">Mula Main</button>
+  <button class="backbar" onclick="handleBack()">← <span data-t="back">Kembali</span></button>
+</div>
+
+<!-- ONLINE -->
+<div class="screen" id="online">
+  <div class="head"><button class="back" onclick="handleBack()">‹</button><h2 data-t="online">Lawan Online</h2></div>
+  <div id="onlineSetup" style="display:none">
+    <div class="box">
+      <b data-t="cfgTitle">Online belum disetup</b>
+      <p class="note" data-t="cfgSub"></p>
+      <textarea class="inp" id="cfgText" rows="7" placeholder='{ apiKey: "...", authDomain: "...", databaseURL: "https://....firebasedatabase.app", projectId: "..." }'></textarea>
+      <button class="primary" onclick="saveCfg()" data-t="cfgSave">Simpan Config</button>
+    </div>
+  </div>
+  <div id="onlineMain">
+    <button class="nameChip" onclick="askName()"><span class="av sym">♚&#xFE0E;</span><span style="flex:1"><small data-t="nameLbl">Nama pemain</small><br><b id="oName">—</b></span><span>✎</span></button>
+    <button class="btn gold" style="margin-top:14px" onclick="quickMatch()">
+      <span class="ic sym">♞&#xFE0E;</span><span><span data-t="quick">Cari Lawan Rawak</span><span class="sub" data-t="quickSub"></span></span>
+    </button>
+    <button class="btn" onclick="createRoom(false)">
+      <span class="ic blue sym">♜&#xFE0E;</span><span><span data-t="mkroom">Cipta Bilik</span><span class="sub" data-t="mkroomSub"></span></span>
+    </button>
+    <button class="btn" onclick="openJoin()">
+      <span class="ic purple">🔑</span><span><span data-t="joinroom">Masuk Bilik Kawan</span><span class="sub" data-t="joinSub"></span></span>
+    </button>
+    <p class="note" id="onMsg" style="text-align:center;margin-top:10px"></p>
+    <button class="backbar" onclick="handleBack()">← <span data-t="back">Kembali</span></button>
+    <div class="foot"><a href="#" onclick="resetCfg();return false" style="color:var(--mut)" data-t="cfgChange">Tukar Firebase config</a></div>
+  </div>
+</div>
+
+<!-- WAITING -->
+<div class="screen center" id="wait">
+  <div class="spin"></div>
+  <div id="waitTxt" class="note" style="font-size:15px"></div>
+  <div class="bigcode" id="waitCode">----</div>
+  <p class="note" id="waitSub"></p>
+  <button class="ghost" style="max-width:260px" onclick="handleBack()" data-t="cancel">Batal</button>
+</div>
+
+<!-- GAME -->
+<div class="screen" id="game">
+  <div class="gtop">
+    <button class="back" onclick="askExitGame()">‹</button>
+    <div class="title" id="gTitle">ProChess</div>
+    <button class="back" onclick="flipBoard()">⇅</button>
+  </div>
+  <div class="pbar" id="pTop"></div>
+  <div class="bwrap"><div id="board"></div></div>
+  <div class="pbar" id="pBot"></div>
+  <div class="status" id="status"></div>
+  <div class="mlist" id="mlist"></div>
+  <div class="acts">
+    <button id="bUndo" onclick="undoMove()"><i>↶</i><span data-t="undo">Undur</span></button>
+    <button id="bHint" onclick="hint()"><i>💡</i><span data-t="hint">Petunjuk</span></button>
+    <button id="bResign" onclick="askResign()"><i>⚑</i><span data-t="resign">Menyerah</span></button>
+    <button id="bNew" onclick="newGameBtn()"><i>↻</i><span data-t="newg">Baru</span></button>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal" id="mPromo"><div class="mbox"><h3 data-t="promo">Naik Pangkat</h3><p data-t="promoSub">Pilih buah baru</p><div class="promo" id="promoBtns"></div></div></div>
+
+<div class="modal" id="mResult"><div class="mbox">
+  <div class="trophy sym" id="rIcon">♚</div><h3 id="rTitle"></h3><p id="rSub"></p><p id="rExtra" style="color:var(--gold2);font-weight:600"></p>
+  <button class="primary" id="rAgain" onclick="playAgain()" data-t="again">Main Lagi</button>
+  <button class="ghost" onclick="closeModal('mResult')" data-t="viewBoard">Lihat Papan</button>
+  <button class="ghost" onclick="exitGame()" data-t="home">Menu Utama</button>
+</div></div>
+
+<div class="modal" id="mConfirm"><div class="mbox">
+  <div class="trophy" id="cIcon">👋</div>
+  <h3 id="cTitle"></h3><p id="cSub"></p>
+  <div class="row2"><button class="ghost" onclick="closeModal('mConfirm')" data-t="no">Tidak</button><button class="primary" id="cYes" data-t="yes">Ya</button></div>
+</div></div>
+
+<div class="modal" id="mName"><div class="mbox">
+  <div class="trophy">👋</div>
+  <h3 data-t="hello">Selamat datang!</h3><p data-t="nameSub"></p>
+  <input class="inp" id="nameInp" maxlength="14" readonly inputmode="none">
+  <div class="kb" id="kbName"></div>
+</div></div>
+
+<div class="modal" id="mJoin"><div class="mbox">
+  <div class="trophy">🔑</div>
+  <h3 data-t="joinroom">Masuk Bilik Kawan</h3><p data-t="joinSub"></p>
+  <input class="inp code-inp" id="codeInp" maxlength="4" placeholder="0000" readonly inputmode="none">
+  <div class="kb num" id="kbCode"></div>
+  <button class="ghost" onclick="closeModal('mJoin')" data-t="cancel">Batal</button>
+</div></div>
+
+<div class="modal" id="mUpd"><div class="mbox">
+  <div class="trophy">🚀</div><h3 data-t="updTitle">Versi baru tersedia!</h3>
+  <p id="updSub"></p>
+  <button class="primary" onclick="doUpdate()" data-t="updNow">Kemas Kini</button>
+  <button class="ghost" id="updLater" data-t="later">Nanti</button>
+</div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   FIREBASE CONFIG (untuk mod online - Realtime Database)
+   ========================================================= */
+const FIREBASE_CONFIG = {
+  apiKey: "",
+  authDomain: "",
+  databaseURL: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: ""
+};
+/* =========================================================
+   AUTO UPDATE - nama repo GitHub app ini (username/repo)
+   ========================================================= */
+const UPDATE_REPO = 'alemmaxx/ProChess';
+const APP_BUILD = parseInt('__APP_BUILD__') || 0;   // diisi automatik oleh GitHub Actions
+
+// ===== ENGINE START =====
+const FILES='abcdefgh';
+const START_FEN='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+const KN=[[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
+const KG=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+const DIAG=[[-1,-1],[-1,1],[1,-1],[1,1]], ORTH=[[-1,0],[1,0],[0,-1],[0,1]], ALLD=DIAG.concat(ORTH);
+const CR=new Array(64).fill(15); CR[60]=12;CR[63]=14;CR[56]=13;CR[4]=3;CR[7]=11;CR[0]=7;
+let B=[],turn='w',castle=15,ep=-1,half=0,full=1,kpos={w:60,b:4},hist=[];
+
+const isW=p=>p<'a';
+function sqIdx(s){return (8-(+s[1]))*8+FILES.indexOf(s[0]);}
+function sqName(i){return FILES[i&7]+(8-(i>>3));}
+function loadFEN(fen){
+  const [pl,t,c,e,h,f]=fen.split(' ');
+  B=new Array(64).fill(null); let i=0;
+  for(const ch of pl){ if(ch==='/')continue; if(ch>='1'&&ch<='8'){i+=+ch;continue;}
+    B[i]=ch; if(ch==='K')kpos.w=i; if(ch==='k')kpos.b=i; i++; }
+  turn=t; castle=(c.includes('K')?1:0)|(c.includes('Q')?2:0)|(c.includes('k')?4:0)|(c.includes('q')?8:0);
+  ep=(e==='-'||!e)?-1:sqIdx(e); half=+h||0; full=+f||1; hist=[];
+}
+function attacked(sq,by){
+  const r=sq>>3,c=sq&7,w=by==='w';
+  const pr=w?r+1:r-1, P=w?'P':'p';
+  if(pr>=0&&pr<8){ if(c>0&&B[pr*8+c-1]===P)return true; if(c<7&&B[pr*8+c+1]===P)return true; }
+  const N=w?'N':'n',K=w?'K':'k',Bs=w?'B':'b',R=w?'R':'r',Q=w?'Q':'q';
+  for(const [dr,dc] of KN){const nr=r+dr,nc=c+dc; if(nr>=0&&nr<8&&nc>=0&&nc<8&&B[nr*8+nc]===N)return true;}
+  for(const [dr,dc] of KG){const nr=r+dr,nc=c+dc; if(nr>=0&&nr<8&&nc>=0&&nc<8&&B[nr*8+nc]===K)return true;}
+  for(const [dr,dc] of DIAG){let nr=r+dr,nc=c+dc; while(nr>=0&&nr<8&&nc>=0&&nc<8){const q=B[nr*8+nc]; if(q){if(q===Bs||q===Q)return true;break;} nr+=dr;nc+=dc;}}
+  for(const [dr,dc] of ORTH){let nr=r+dr,nc=c+dc; while(nr>=0&&nr<8&&nc>=0&&nc<8){const q=B[nr*8+nc]; if(q){if(q===R||q===Q)return true;break;} nr+=dr;nc+=dc;}}
+  return false;
+}
+const inCheck=side=>attacked(kpos[side],side==='w'?'b':'w');
+function gen(side,capsOnly){
+  const mv=[],white=side==='w',opp=white?'b':'w';
+  for(let sq=0;sq<64;sq++){
+    const p=B[sq]; if(!p||isW(p)!==white)continue;
+    const ty=p.toLowerCase(),r=sq>>3,c=sq&7;
+    if(ty==='p'){
+      const dr=white?-1:1,nr=r+dr,promoRow=white?0:7;
+      if(nr<0||nr>7)continue;
+      const f=nr*8+c;
+      if(!B[f]){
+        if(nr===promoRow){for(const pr of 'qrbn')mv.push({f:sq,t:f,p,x:null,pr:white?pr.toUpperCase():pr});}
+        else if(!capsOnly){ mv.push({f:sq,t:f,p,x:null});
+          if(r===(white?6:1)){const f2=(r+2*dr)*8+c; if(!B[f2])mv.push({f:sq,t:f2,p,x:null,dbl:1});} }
+      }
+      for(const dc of [-1,1]){const nc=c+dc; if(nc<0||nc>7)continue; const t=nr*8+nc,q=B[t];
+        if(q&&isW(q)!==white){ if(nr===promoRow){for(const pr of 'qrbn')mv.push({f:sq,t,p,x:q,pr:white?pr.toUpperCase():pr});} else mv.push({f:sq,t,p,x:q}); }
+        else if(t===ep&&!q){ mv.push({f:sq,t,p,x:white?'p':'P',ep:1}); }
+      }
+    } else if(ty==='n'||ty==='k'){
+      for(const [dr,dc] of (ty==='n'?KN:KG)){const nr=r+dr,nc=c+dc; if(nr<0||nr>7||nc<0||nc>7)continue;
+        const t=nr*8+nc,q=B[t]; if(!q){if(!capsOnly)mv.push({f:sq,t,p,x:null});} else if(isW(q)!==white)mv.push({f:sq,t,p,x:q}); }
+      if(ty==='k'&&!capsOnly){
+        if(white&&sq===60){
+          if((castle&1)&&!B[61]&&!B[62]&&B[63]==='R'&&!attacked(60,opp)&&!attacked(61,opp)&&!attacked(62,opp))mv.push({f:60,t:62,p,x:null,cs:1});
+          if((castle&2)&&!B[59]&&!B[58]&&!B[57]&&B[56]==='R'&&!attacked(60,opp)&&!attacked(59,opp)&&!attacked(58,opp))mv.push({f:60,t:58,p,x:null,cs:1});
+        } else if(!white&&sq===4){
+          if((castle&4)&&!B[5]&&!B[6]&&B[7]==='r'&&!attacked(4,opp)&&!attacked(5,opp)&&!attacked(6,opp))mv.push({f:4,t:6,p,x:null,cs:1});
+          if((castle&8)&&!B[3]&&!B[2]&&!B[1]&&B[0]==='r'&&!attacked(4,opp)&&!attacked(3,opp)&&!attacked(2,opp))mv.push({f:4,t:2,p,x:null,cs:1});
+        }
+      }
+    } else {
+      for(const [dr,dc] of (ty==='b'?DIAG:ty==='r'?ORTH:ALLD)){let nr=r+dr,nc=c+dc;
+        while(nr>=0&&nr<8&&nc>=0&&nc<8){const t=nr*8+nc,q=B[t];
+          if(!q){if(!capsOnly)mv.push({f:sq,t,p,x:null});} else {if(isW(q)!==white)mv.push({f:sq,t,p,x:q});break;}
+          nr+=dr;nc+=dc;}}
+    }
+  }
+  return mv;
+}
+function make(m){
+  hist.push({m,castle,ep,half});
+  const white=turn==='w';
+  B[m.t]=m.pr||m.p; B[m.f]=null;
+  if(m.ep)B[m.t+(white?8:-8)]=null;
+  if(m.cs){ if(m.t===62){B[61]=B[63];B[63]=null;} else if(m.t===58){B[59]=B[56];B[56]=null;}
+    else if(m.t===6){B[5]=B[7];B[7]=null;} else if(m.t===2){B[3]=B[0];B[0]=null;} }
+  if(m.p==='K')kpos.w=m.t; else if(m.p==='k')kpos.b=m.t;
+  castle&=CR[m.f]&CR[m.t];
+  ep=m.dbl?(m.f+m.t)>>1:-1;
+  half=(m.p==='P'||m.p==='p'||m.x)?0:half+1;
+  if(!white)full++;
+  turn=white?'b':'w';
+}
+function unmake(){
+  const h=hist.pop(),m=h.m;
+  turn=turn==='w'?'b':'w'; const white=turn==='w';
+  B[m.f]=m.p;
+  if(m.ep){B[m.t]=null;B[m.t+(white?8:-8)]=m.x;} else B[m.t]=m.x;
+  if(m.cs){ if(m.t===62){B[63]=B[61];B[61]=null;} else if(m.t===58){B[56]=B[59];B[59]=null;}
+    else if(m.t===6){B[7]=B[5];B[5]=null;} else if(m.t===2){B[0]=B[3];B[3]=null;} }
+  if(m.p==='K')kpos.w=m.f; else if(m.p==='k')kpos.b=m.f;
+  castle=h.castle;ep=h.ep;half=h.half; if(!white)full--;
+}
+function legal(){const side=turn; return gen(side,false).filter(m=>{make(m);const ok=!inCheck(side);unmake();return ok;});}
+function perft(d){if(d===0)return 1;let n=0;const side=turn;for(const m of gen(side,false)){make(m);if(!inCheck(side))n+=perft(d-1);unmake();}return n;}
+const uci=m=>sqName(m.f)+sqName(m.t)+(m.pr?m.pr.toLowerCase():'');
+const posKey=()=>B.map(p=>p||'.').join('')+turn+castle+ep;
+function san(m,list){
+  let s;
+  if(m.cs)s=(m.t===62||m.t===6)?'O-O':'O-O-O';
+  else{const ty=m.p.toLowerCase(),to=sqName(m.t);
+    if(ty==='p')s=(m.x?FILES[m.f&7]+'x':'')+to+(m.pr?'='+m.pr.toUpperCase():'');
+    else{let dis='';const o=list.filter(x=>x.p===m.p&&x.t===m.t&&x.f!==m.f);
+      if(o.length){const sf=o.some(x=>(x.f&7)===(m.f&7)),sr=o.some(x=>(x.f>>3)===(m.f>>3));
+        dis=!sf?FILES[m.f&7]:!sr?String(8-(m.f>>3)):sqName(m.f);}
+      s=ty.toUpperCase()+dis+(m.x?'x':'')+to;}}
+  make(m);const chk=inCheck(turn);const mate=chk&&legal().length===0;unmake();
+  return s+(mate?'#':chk?'+':'');
+}
+function insufficient(){
+  const pcs=[];for(let i=0;i<64;i++){const p=B[i];if(p&&p!=='K'&&p!=='k')pcs.push([p.toLowerCase(),i]);}
+  if(!pcs.length)return true;
+  if(pcs.length===1&&(pcs[0][0]==='n'||pcs[0][0]==='b'))return true;
+  if(pcs.every(x=>x[0]==='b')){const col=pcs.map(x=>((x[1]>>3)+(x[1]&7))%2);return col.every(v=>v===col[0]);}
+  return false;
+}
+
+/* ---------- AI ---------- */
+const PV={p:100,n:320,b:330,r:500,q:900,k:0};
+const PST={
+p:[0,0,0,0,0,0,0,0,50,50,50,50,50,50,50,50,10,10,20,30,30,20,10,10,5,5,10,25,25,10,5,5,0,0,0,20,20,0,0,0,5,-5,-10,0,0,-10,-5,5,5,10,10,-20,-20,10,10,5,0,0,0,0,0,0,0,0],
+n:[-50,-40,-30,-30,-30,-30,-40,-50,-40,-20,0,0,0,0,-20,-40,-30,0,10,15,15,10,0,-30,-30,5,15,20,20,15,5,-30,-30,0,15,20,20,15,0,-30,-30,5,10,15,15,10,5,-30,-40,-20,0,5,5,0,-20,-40,-50,-40,-30,-30,-30,-30,-40,-50],
+b:[-20,-10,-10,-10,-10,-10,-10,-20,-10,0,0,0,0,0,0,-10,-10,0,5,10,10,5,0,-10,-10,5,5,10,10,5,5,-10,-10,0,10,10,10,10,0,-10,-10,10,10,10,10,10,10,-10,-10,5,0,0,0,0,5,-10,-20,-10,-10,-10,-10,-10,-10,-20],
+r:[0,0,0,0,0,0,0,0,5,10,10,10,10,10,10,5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,0,0,0,5,5,0,0,0],
+q:[-20,-10,-10,-5,-5,-10,-10,-20,-10,0,0,0,0,0,0,-10,-10,0,5,5,5,5,0,-10,-5,0,5,5,5,5,0,-5,0,0,5,5,5,5,0,-5,-10,5,5,5,5,5,0,-10,-10,0,5,0,0,0,0,-10,-20,-10,-10,-5,-5,-10,-10,-20],
+k:[-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-20,-30,-30,-40,-40,-30,-30,-20,-10,-20,-20,-20,-20,-20,-20,-10,20,20,0,0,0,0,20,20,20,30,10,0,0,10,30,20],
+ke:[-50,-40,-30,-20,-20,-30,-40,-50,-30,-20,-10,0,0,-10,-20,-30,-30,-10,20,30,30,20,-10,-30,-30,-10,30,40,40,30,-10,-30,-30,-10,30,40,40,30,-10,-30,-30,-10,20,30,30,20,-10,-30,-30,-30,0,0,0,0,-30,-30,-50,-30,-30,-30,-30,-30,-30,-50]
+};
+function evaluate(){
+  let mat=0;for(let i=0;i<64;i++){const p=B[i];if(p){const t=p.toLowerCase();if(t!=='k'&&t!=='p')mat+=PV[t];}}
+  const eg=mat<=2600; let s=0;
+  for(let i=0;i<64;i++){const p=B[i];if(!p)continue;const w=isW(p),t=p.toLowerCase();
+    const tb=(t==='k'&&eg)?PST.ke:PST[t]; const v=PV[t]+tb[w?i:i^56]; s+=w?v:-v;}
+  return turn==='w'?s:-s;
+}
+const MATE=100000,INF=1e9;
+let nodes=0,deadline=0,aborted=false,useQ=true,killers=[];
+function scoreMove(m,ply){
+  let s=0; if(m.x)s=10000+10*PV[m.x.toLowerCase()]-PV[m.p.toLowerCase()];
+  if(m.pr)s+=8000+PV[m.pr.toLowerCase()];
+  const k=killers[ply]; if(k&&!m.x&&k.f===m.f&&k.t===m.t)s+=5000;
+  return s;
+}
+function order(mv,ply){for(const m of mv)m._s=scoreMove(m,ply);mv.sort((a,b)=>b._s-a._s);}
+function qs(alpha,beta,d){
+  nodes++; if((nodes&2047)===0&&Date.now()>deadline)aborted=true; if(aborted)return 0;
+  const stand=evaluate(); if(stand>=beta)return beta; if(stand>alpha)alpha=stand; if(d<=0)return alpha;
+  const side=turn,mv=gen(side,true);order(mv,63);
+  for(const m of mv){make(m);if(inCheck(side)){unmake();continue;}
+    const sc=-qs(-beta,-alpha,d-1);unmake();if(aborted)return 0;
+    if(sc>=beta)return beta;if(sc>alpha)alpha=sc;}
+  return alpha;
+}
+function negamax(depth,alpha,beta,ply){
+  nodes++; if((nodes&2047)===0&&Date.now()>deadline)aborted=true; if(aborted)return 0;
+  if(half>=100)return 0;
+  const side=turn,chk=inCheck(side);
+  if(depth<=0&&!chk)return useQ?qs(alpha,beta,6):evaluate();
+  const mv=gen(side,false);order(mv,ply);
+  let n=0,best=-INF;
+  for(const m of mv){make(m);if(inCheck(side)){unmake();continue;}n++;
+    const sc=-negamax(depth-1,-beta,-alpha,ply+1);unmake();if(aborted)return 0;
+    if(sc>best)best=sc; if(sc>alpha)alpha=sc;
+    if(alpha>=beta){if(!m.x)killers[ply]=m;break;}}
+  if(!n)return chk?-MATE+ply:0;
+  return best;
+}
+const LEVELS=[
+  {name:'Mudah',stars:'★',depth:1,time:600,q:false,noise:90,rand:.3,desc:'Sesuai untuk pemula'},
+  {name:'Sederhana',stars:'★★',depth:2,time:1200,q:true,noise:18,rand:0,desc:'Cabaran untuk pemain biasa'},
+  {name:'Sukar',stars:'★★★',depth:6,time:2500,q:true,noise:0,rand:0,desc:'Bot berfikir lebih dalam'}
+];
+function searchBest(level){
+  const cfg=LEVELS[level]; const moves=legal(); if(!moves.length)return null;
+  for(let i=moves.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[moves[i],moves[j]]=[moves[j],moves[i]];}
+  if(cfg.rand&&Math.random()<cfg.rand){const caps=moves.filter(m=>m.x);const pool=(caps.length&&Math.random()<.5)?caps:moves;return pool[Math.floor(Math.random()*pool.length)];}
+  deadline=Date.now()+cfg.time;aborted=false;nodes=0;useQ=cfg.q;killers=[];
+  order(moves,0); let best=moves[0];
+  if(cfg.noise){ // full-window so every score is exact, then add noise
+    let bs=-INF;
+    for(const m of moves){make(m);const sc=-negamax(cfg.depth-1,-INF,INF,1);unmake();if(aborted)break;
+      const v=sc+(Math.random()*2-1)*cfg.noise; if(v>bs){bs=v;best=m;}}
+    return best;
+  }
+  for(let d=1;d<=cfg.depth;d++){
+    let alpha=-INF,ib=null,is=-INF;
+    const list=[best].concat(moves.filter(m=>m!==best));
+    for(const m of list){make(m);const sc=-negamax(d-1,-INF,-alpha,1);unmake();if(aborted)break;
+      if(sc>is){is=sc;ib=m;} if(sc>alpha)alpha=sc;}
+    if(aborted){ if(ib&&is>-INF&&ib!==best&&d>1){/* partial result: only trust if better move found first */} break; }
+    best=ib; if(is>MATE-200)break;
+  }
+  return best;
+}
+// ===== ENGINE END =====
+
+
+/* ============ i18n ============ */
+const T={
+ms:{vsBot:'Lawan Bot',vsBotSub:'3 level: Mudah, Sederhana, Sukar',online:'Lawan Online',onlineSub:'Cari lawan rawak atau main dengan kawan',local:'2 Pemain (1 Phone)',localSub:'Main bergilir atas phone yang sama',
+ exitBtn:'Keluar App',exitApp:'Keluar ProChess?',exitSub:'Jumpa lagi! Teruskan asah strategi anda.',set:'Tetapan',back:'Kembali',prefs:'Pilihan',
+ pickLvl:'Pilih Level',easy:'Mudah',med:'Sederhana',hard:'Sukar',easyD:'Sesuai untuk pemula',medD:'Cabaran untuk pemain biasa',hardD:'Bot berfikir lebih dalam',
+ playAs:'Anda main sebagai',white:'Putih',black:'Hitam',random:'Rawak',start:'Mula Main',recW:'M',recL:'K',recD:'S',
+ nameLbl:'Nama pemain',quick:'Cari Lawan Rawak',quickSub:'Main dengan sesiapa yang sedang online',mkroom:'Cipta Bilik',mkroomSub:'Dapat kod 4 digit, kongsi dengan kawan',
+ joinroom:'Masuk Bilik Kawan',joinSub:'Masukkan kod 4 digit daripada kawan',join:'Masuk',
+ cfgTitle:'Online belum disetup',cfgSub:'Tampal firebaseConfig dari Firebase Console (Project settings → Your apps → Web app). Pastikan ada databaseURL.',cfgSave:'Simpan Config',cfgBad:'Config tidak sah — perlu apiKey & databaseURL',cfgSaved:'Config disimpan',cfgChange:'Tukar Firebase config',cfgFixed:'Config ditetapkan dalam kod app',
+ connecting:'Menyambung ke server…',noNet:'Tiada internet atau config salah. Cuba lagi.',offline:'Tiada sambungan internet',creating:'Mencipta bilik…',createFail:'Gagal cipta bilik, cuba lagi.',joining:'Masuk bilik…',
+ noRoom:'Bilik {c} tidak wujud.',selfRoom:'Ini bilik anda sendiri.',fullRoom:'Bilik sudah penuh / sudah bermula.',searching:'Mencari lawan…',err:'Ralat',checkRules:'(semak Rules database)',
+ yourCode:'Kod bilik anda',shareCode:'Kongsi kod ini dengan kawan anda. Permainan bermula bila lawan masuk.',seekSub:'Sila tunggu sebentar. Kawan juga boleh masuk guna kod di atas.',
+ cancel:'Batal',cancelWait:'Batal Menunggu?',cancelWaitSub:'Bilik ini akan ditutup.',roomClosed:'Bilik telah ditutup',roomFull:'Bilik sudah penuh',youPlay:'Anda main sebagai {c}',
+ undo:'Undur',hint:'Petunjuk',resign:'Menyerah',newg:'Baru',promo:'Naik Pangkat',promoSub:'Pilih buah baru',again:'Main Lagi',viewBoard:'Lihat Papan',home:'Menu Utama',yes:'Ya',no:'Tidak',
+ resignQ:'Menyerah?',resignSub:'Anda akan kalah permainan ini.',newQ:'Permainan Baru?',newSub:'Permainan sekarang akan ditamatkan.',
+ leave:'Keluar Permainan?',leaveOn:'Keluar sekarang dikira menyerah kalah.',leaveBot:'Permainan ini tidak akan disimpan.',leaveMenu:'Kembali ke menu?',
+ waitingOpp:'Menunggu lawan…',wantsRematch:'{n} ajak main lagi!',oppLeft:'Lawan telah keluar',oppDisc:'Lawan terputus sambungan',sendFail:'Langkah gagal dihantar — semak internet',
+ you:'Anda',opp:'Lawan',bot:'Bot',thinking:'berfikir…',yourTurn:'Giliran anda',oppTurn:'Giliran lawan',whiteTurn:'Giliran Putih',blackTurn:'Giliran Hitam',botThinking:'Bot sedang berfikir…',calc:'Mengira…',
+ drawn:'Permainan seri',ended:'Permainan tamat',twoP:'2 Pemain',room:'Bilik',win:'Anda Menang!',lose:'Anda Kalah',draw:'Seri',wWin:'Putih Menang!',bWin:'Hitam Menang!',
+ mate:'Checkmate!',stalemate:'Stalemate — tiada langkah sah',fifty:'Peraturan 50 langkah',material:'Buah tidak cukup untuk checkmate',repeat:'Kedudukan berulang 3 kali',oppResigned:'Lawan menyerah kalah',youResigned:'Anda menyerah kalah',wResigned:'Putih menyerah kalah',
+ tryMove:'Cuba: {m}',lang:'Bahasa',sound:'Bunyi',vib:'Getaran',showMoves:'Tunjuk langkah sah',botRec:'Rekod lawan bot',
+ hello:'Selamat datang!',nameSub:'Masukkan nama anda untuk lawan online',save:'Simpan',saved:'Disimpan',needName:'Sila masukkan nama dahulu',enterCode:'Masukkan kod 4 digit',
+ version:'Versi',checkUpd:'Semak Kemas Kini',updNow:'Kemas Kini',later:'Nanti',updTitle:'Versi baru tersedia!',updSub:'Versi {v} sedia untuk dimuat turun. Semua data & rekod anda kekal selamat.',
+ updBar:'Versi baru {v} tersedia',updLatest:'Anda guna versi terkini ✓',updFail:'Tak dapat semak kemas kini',updDl:'Memuat turun… buka fail APK untuk pasang'},
+en:{vsBot:'Play vs Bot',vsBotSub:'3 levels: Easy, Medium, Hard',online:'Play Online',onlineSub:'Random opponent or play with a friend',local:'2 Players (1 Phone)',localSub:'Take turns on the same phone',
+ exitBtn:'Exit App',exitApp:'Exit ProChess?',exitSub:'See you again! Keep sharpening your strategy.',set:'Settings',back:'Back',prefs:'Preferences',
+ pickLvl:'Choose Level',easy:'Easy',med:'Medium',hard:'Hard',easyD:'Good for beginners',medD:'A challenge for casual players',hardD:'The bot thinks deeper',
+ playAs:'You play as',white:'White',black:'Black',random:'Random',start:'Start Game',recW:'W',recL:'L',recD:'D',
+ nameLbl:'Player name',quick:'Find Random Opponent',quickSub:'Play anyone who is online now',mkroom:'Create Room',mkroomSub:'Get a 4-digit code to share with a friend',
+ joinroom:"Join Friend's Room",joinSub:'Enter the 4-digit code from your friend',join:'Join',
+ cfgTitle:'Online not set up',cfgSub:'Paste firebaseConfig from Firebase Console (Project settings → Your apps → Web app). Make sure it has databaseURL.',cfgSave:'Save Config',cfgBad:'Invalid config — needs apiKey & databaseURL',cfgSaved:'Config saved',cfgChange:'Change Firebase config',cfgFixed:'Config is set inside the app code',
+ connecting:'Connecting…',noNet:'No internet or wrong config. Try again.',offline:'No internet connection',creating:'Creating room…',createFail:'Could not create room, try again.',joining:'Joining room…',
+ noRoom:'Room {c} not found.',selfRoom:'This is your own room.',fullRoom:'Room is full / already started.',searching:'Finding opponent…',err:'Error',checkRules:'(check database Rules)',
+ yourCode:'Your room code',shareCode:'Share this code with your friend. The game starts when they join.',seekSub:'Please wait. A friend can also join with the code above.',
+ cancel:'Cancel',cancelWait:'Stop waiting?',cancelWaitSub:'This room will be closed.',roomClosed:'Room was closed',roomFull:'Room is full',youPlay:'You are playing {c}',
+ undo:'Undo',hint:'Hint',resign:'Resign',newg:'New',promo:'Promotion',promoSub:'Choose a new piece',again:'Play Again',viewBoard:'View Board',home:'Main Menu',yes:'Yes',no:'No',
+ resignQ:'Resign?',resignSub:'You will lose this game.',newQ:'New Game?',newSub:'The current game will end.',
+ leave:'Leave game?',leaveOn:'Leaving now counts as resigning.',leaveBot:'This game will not be saved.',leaveMenu:'Back to the menu?',
+ waitingOpp:'Waiting for opponent…',wantsRematch:'{n} wants a rematch!',oppLeft:'Opponent has left',oppDisc:'Opponent disconnected',sendFail:'Move failed to send — check internet',
+ you:'You',opp:'Opponent',bot:'Bot',thinking:'thinking…',yourTurn:'Your turn',oppTurn:"Opponent's turn",whiteTurn:'White to move',blackTurn:'Black to move',botThinking:'Bot is thinking…',calc:'Calculating…',
+ drawn:'Game drawn',ended:'Game over',twoP:'2 Players',room:'Room',win:'You Win!',lose:'You Lose',draw:'Draw',wWin:'White Wins!',bWin:'Black Wins!',
+ mate:'Checkmate!',stalemate:'Stalemate — no legal moves',fifty:'50-move rule',material:'Insufficient material',repeat:'Threefold repetition',oppResigned:'Opponent resigned',youResigned:'You resigned',wResigned:'White resigned',
+ tryMove:'Try: {m}',lang:'Language',sound:'Sound',vib:'Vibration',showMoves:'Show legal moves',botRec:'Bot record',
+ hello:'Welcome!',nameSub:'Enter your name for online play',save:'Save',saved:'Saved',needName:'Please enter your name first',enterCode:'Enter a 4-digit code',
+ version:'Version',checkUpd:'Check for Update',updNow:'Update',later:'Later',updTitle:'New version available!',updSub:'Version {v} is ready to download. All your data & records stay safe.',
+ updBar:'New version {v} available',updLatest:'You are on the latest version ✓',updFail:'Could not check for updates',updDl:'Downloading… open the APK file to install'}
+};
+
+/* ---------- UTIL ---------- */
+const $=id=>document.getElementById(id);
+const store={get(k,d){try{const v=localStorage.getItem('prochess_'+k);return v==null?d:JSON.parse(v);}catch(e){return d;}},
+  set(k,v){try{localStorage.setItem('prochess_'+k,JSON.stringify(v));}catch(e){}}};
+let S=Object.assign({lang:'ms',sound:true,vib:true,moves:true},store.get('settings',{}));
+const t=k=>(T[S.lang]&&T[S.lang][k])||T.ms[k]||k;
+const LVKEY=['easy','med','hard'];
+function applyLang(){
+  document.documentElement.lang=S.lang;
+  document.querySelectorAll('[data-t]').forEach(e=>e.textContent=t(e.dataset.t));
+  document.querySelectorAll('.seg button[data-l]').forEach(b=>b.classList.toggle('on',b.dataset.l===S.lang));
+  $('nameInp').placeholder=S.lang==='ms'?'Nama anda':'Your name';
+}
+function setLang(l){S.lang=l;store.set('settings',S);applyLang();buildKBs();renderLevels();refreshSet();
+  if(updInfo)$('updTxt').textContent=t('updBar').replace('{v}',verLabel(updInfo.n));
+  if(G.mode&&curScreen()==='game'){setTitle();render();}}
+function toggleSet(k){S[k]=!S[k];store.set('settings',S);refreshSet();if(G.mode)render();}
+function refreshSet(){
+  $('tSound').classList.toggle('on',S.sound);$('tVib').classList.toggle('on',S.vib);$('tMoves').classList.toggle('on',S.moves);
+  const n=store.get('name','')||'—';$('sName').textContent=n;$('oName').textContent=n;
+  const st=store.get('stats',{});
+  $('myStats').innerHTML=LEVELS.map((L,i)=>{const s=st[i]||{w:0,l:0,d:0};return `<div><b>${L.stars} ${t(LVKEY[i])}</b><span>${s.w}${t('recW')} · ${s.l}${t('recL')} · ${s.d}${t('recD')}</span></div>`;}).join('');
+}
+const GLY={k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟'};
+const pcHTML=(p,cls='')=>`<span class="pc ${isW(p)?'w':'b'} ${cls}">${GLY[p.toLowerCase()]}︎</span>`;
+function curScreen(){const s=document.querySelector('.screen.active');return s?s.id:'home';}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id===id));window.scrollTo(0,0);
+  if(id==='botSetup')renderLevels();if(id==='settings')refreshSet();}
+function toast(m){const el=$('toast');el.textContent=m;el.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>el.classList.remove('show'),2400);}
+function closeModal(id){$(id).classList.remove('show');}
+function openModal(id){$(id).classList.add('show');}
+function confirmBox(icon,title,sub,yes){$('cIcon').textContent=icon;$('cTitle').textContent=title;$('cSub').textContent=sub;$('cYes').onclick=()=>{closeModal('mConfirm');yes();};openModal('mConfirm');}
+let AC;function beep(f,d,type='sine',v=.12){if(!S.sound)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(v,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d);}catch(e){}}
+function vib(ms){if(!S.vib)return;try{navigator.vibrate&&navigator.vibrate(ms);}catch(e){}}
+let ME=store.get('id',null); if(!ME){ME='p'+Math.random().toString(36).slice(2,10)+Date.now().toString(36);store.set('id',ME);}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+/* ---------- NAMA (keyboard dalam app) ---------- */
+let afterName=null;
+function askName(then){afterName=typeof then==='function'?then:null;$('nameInp').value=store.get('name','');openModal('mName');}
+function saveName(){const n=$('nameInp').value.trim().replace(/\s+/g,' ').slice(0,14);if(!n){toast(t('needName'));return;}
+  store.set('name',n);closeModal('mName');refreshSet();toast(t('saved')+' ✓');const f=afterName;afterName=null;if(f)f(n);}
+function buildKB(box,inp,mode){
+  if(mode==='code'){
+    box.innerHTML=['1','2','3','4','5','6','7','8','9','DEL','0','OK'].map(k=>`<button data-k="${k}" class="${k==='OK'?'ok':''}">${k==='DEL'?'⌫':k==='OK'?t('join'):k}</button>`).join('');
+  } else {
+    const rows=['1234567890','QWERTYUIOP','ASDFGHJKL','ZXCVBNM'];
+    box.innerHTML=rows.map((r,i)=>'<div class="r">'+[...r].map(c=>`<button data-k="${c}">${c}</button>`).join('')+(i===rows.length-1?'<button class="w" data-k="DEL">⌫</button>':'')+'</div>').join('')
+      +`<div class="r"><button class="sp" data-k=" ">␣</button><button class="ok" data-k="OK">${t('save')}</button></div>`;
+  }
+  box.querySelectorAll('button').forEach(b=>b.onclick=()=>kbPress(inp,mode,b.dataset.k));
+}
+function kbPress(inp,mode,k){beep(520,.05,'triangle',.05);vib(8);const max=+inp.maxLength||14;let v=inp.value;
+  if(k==='OK')return mode==='code'?joinRoom():saveName();
+  if(k==='DEL')v=v.slice(0,-1);
+  else if(v.length<max){ if(mode==='code'){if(/\d/.test(k))v+=k;}
+    else if(k===' '){if(v&&!v.endsWith(' '))v+=' ';}
+    else v+=(!v||v.endsWith(' '))?k.toUpperCase():k.toLowerCase(); }
+  inp.value=v;
+}
+function buildKBs(){buildKB($('kbName'),$('nameInp'),'name');buildKB($('kbCode'),$('codeInp'),'code');}
+document.addEventListener('keydown',e=>{const m=document.querySelector('.modal.show');if(!m||(m.id!=='mName'&&m.id!=='mJoin'))return;
+  const inp=m.id==='mName'?$('nameInp'):$('codeInp'),mode=m.id==='mName'?'name':'code';
+  if(e.key==='Enter')kbPress(inp,mode,'OK');else if(e.key==='Backspace')kbPress(inp,mode,'DEL');else if(e.key===' ')kbPress(inp,mode,' ');
+  else if(/^[a-z0-9]$/i.test(e.key))kbPress(inp,mode,e.key.toUpperCase());else return;e.preventDefault();});
+
+/* ---------- BOT SETUP ---------- */
+let selLevel=store.get('lvl',0), selColor='w';
+function renderLevels(){
+  const st=store.get('stats',{});
+  $('lvlList').innerHTML=LEVELS.map((L,i)=>{const s=st[i]||{w:0,l:0,d:0};
+    return `<button class="lvl ${i===selLevel?'on':''}" onclick="selLevel=${i};store.set('lvl',${i});renderLevels()">
+      <span class="st">${L.stars}</span><span><b>${t(LVKEY[i])}</b><small>${t(LVKEY[i]+'D')}</small></span>
+      <span class="rec">${t('recW')} ${s.w} · ${t('recL')} ${s.l}<br>${t('recD')} ${s.d}</span></button>`;}).join('');
+}
+$('colSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;selColor=b.dataset.c;
+  document.querySelectorAll('#colSeg button').forEach(x=>x.classList.toggle('on',x===b));};
+
+/* ---------- GAME ---------- */
+let G={};
+let posKeys=[];
+function setTitle(){$('gTitle').innerHTML=G.mode==='bot'?`${t('bot')} <b>${t(LVKEY[G.level])}</b>`:G.mode==='online'?`Online · ${t('room')} <b>${FB.code}</b>`:t('twoP');}
+function startGame(o){
+  loadFEN(START_FEN);
+  G={mode:o.mode,my:o.my,level:o.level,oppName:o.oppName,oppId:o.oppId,myName:o.myName||t('you'),
+     over:false,sel:-1,sanList:[],uciList:[],flip:o.my==='b',thinking:false,oppOnline:true,lastPop:-1,exited:false};
+  posKeys=[posKey()]; G.legal=legal();
+  ['mResult','mPromo','mConfirm','mJoin','mName'].forEach(closeModal);
+  setTitle();
+  $('bUndo').style.display=o.mode==='online'?'none':'';
+  $('bHint').style.display=o.mode==='bot'?'':'none';
+  $('bResign').style.display=o.mode==='local'?'none':'';
+  $('bNew').style.display=o.mode==='online'?'none':'';
+  show('game'); render();
+  if(o.mode==='bot'&&turn!==G.my)setTimeout(botTurn,500);
+}
+function startBot(){const my=selColor==='r'?(Math.random()<.5?'w':'b'):selColor;startGame({mode:'bot',my,level:selLevel});}
+function startLocal(){startGame({mode:'local',my:'w'});}
+function myTurn(){return G.mode==='local'||turn===G.my;}
+
+$('board').addEventListener('click',e=>{const s=e.target.closest('.sq');if(s)onSq(+s.dataset.i);});
+function onSq(i){
+  if(G.over||G.thinking||!myTurn())return;
+  const p=B[i];
+  if(G.sel>=0){const c=G.legal.filter(m=>m.f===G.sel&&m.t===i);
+    if(c.length){if(c.length>1)pickPromo(c);else playerMove(c[0]);return;}}
+  G.sel=(p&&(isW(p)?'w':'b')===turn&&i!==G.sel)?i:-1; render();
+}
+function pickPromo(c){
+  const w=turn==='w';
+  $('promoBtns').innerHTML=['q','r','b','n'].map(x=>`<button data-t2="${x}">${pcHTML(w?x.toUpperCase():x)}</button>`).join('');
+  $('promoBtns').onclick=e=>{const b=e.target.closest('button');if(!b)return;closeModal('mPromo');
+    playerMove(c.find(m=>m.pr.toLowerCase()===b.dataset.t2));};
+  openModal('mPromo');
+}
+function playerMove(m){
+  commitMove(m);
+  if(G.mode==='online')pushMove();
+  if(G.mode==='local'&&!G.over){G.flip=turn==='b';render();}
+  if(G.mode==='bot'&&!G.over)setTimeout(botTurn,250);
+}
+function commitMove(m){
+  const s=san(m,G.legal); make(m);
+  G.sanList.push(s);G.uciList.push(uci(m));posKeys.push(posKey());
+  G.sel=-1;G.lastPop=m.t;G.legal=legal();
+  if(s.includes('+')||s.includes('#')){beep(880,.18,'triangle',.14);vib(40);} else if(m.x){beep(260,.12,'square',.06);vib(15);} else beep(520,.08,'triangle');
+  checkEnd(); render();
+}
+function checkEnd(){
+  let res=null,why=null;
+  if(!G.legal.length){ if(inCheck(turn)){res=turn==='w'?'0-1':'1-0';why='mate';} else {res='1/2';why='stalemate';} }
+  else if(half>=100){res='1/2';why='fifty';}
+  else if(insufficient()){res='1/2';why='material';}
+  else {const k=posKeys[posKeys.length-1];if(posKeys.filter(x=>x===k).length>=3){res='1/2';why='repeat';}}
+  if(res)endGame(res,why,false);
+}
+function endGame(res,why,remote){
+  if(G.over)return; G.over=true; G.result=res;G.why=why; render();
+  if(G.mode==='online'&&!remote&&FB.ref)FB.ref.update({status:'ended',result:res,reason:why});
+  let title,icon,sub=why==='resign'?'':t(why);
+  if(res==='1/2'){title=t('draw');icon='½';}
+  else{const winner=res==='1-0'?'w':'b';
+    if(G.mode==='local'){title=winner==='w'?t('wWin'):t('bWin');icon=winner==='w'?'♔':'♚';}
+    else if(winner===G.my){title=t('win');icon='♛';beep(660,.15);setTimeout(()=>beep(880,.25),150);vib([40,40,80]);}
+    else{title=t('lose');icon='♟';}
+    if(why==='resign')sub=G.mode==='local'?t('wResigned'):(winner===G.my?t('oppResigned'):t('youResigned'));
+  }
+  if(G.mode==='bot'){const st=store.get('stats',{});const s=st[G.level]||{w:0,l:0,d:0};
+    if(res==='1/2')s.d++;else if((res==='1-0'?'w':'b')===G.my)s.w++;else s.l++;st[G.level]=s;store.set('stats',st);}
+  $('rIcon').textContent=icon+'︎';$('rTitle').textContent=title;$('rSub').textContent=sub;$('rExtra').textContent='';
+  $('rAgain').disabled=false;$('rAgain').textContent=t('again');
+  setTimeout(()=>{if(G.over&&!G.exited)openModal('mResult');},why==='resign'?100:700);
+}
+function botTurn(){
+  if(G.over||G.mode!=='bot'||turn===G.my)return;
+  G.thinking=true;render();
+  const t0=Date.now();
+  setTimeout(()=>{
+    const m=searchBest(G.level);
+    const wait=Math.max(0,450-(Date.now()-t0));
+    setTimeout(()=>{G.thinking=false;if(m&&G.mode==='bot'&&!G.over&&!G.exited)commitMove(m);else render();},wait);
+  },40);
+}
+function undoMove(){
+  if(G.thinking||!hist.length)return;
+  let n=G.mode==='bot'?(turn===G.my?2:1):1;
+  while(n-->0&&hist.length){unmake();G.sanList.pop();G.uciList.pop();posKeys.pop();}
+  G.over=false;G.sel=-1;G.lastPop=-1;G.legal=legal();closeModal('mResult');
+  if(G.mode==='local')G.flip=turn==='b';
+  render();
+  if(G.mode==='bot'&&turn!==G.my)setTimeout(botTurn,300);
+}
+function hint(){
+  if(G.over||G.thinking||turn!==G.my)return;
+  G.thinking=true;render();
+  setTimeout(()=>{const m=searchBest(1);G.thinking=false;if(m){G.sel=m.f;render();toast(t('tryMove').replace('{m}',san(m,G.legal)));}else render();},40);
+}
+function flipBoard(){G.flip=!G.flip;render();}
+function askResign(){if(G.over)return;confirmBox('⚑',t('resignQ'),t('resignSub'),()=>endGame(G.my==='w'?'0-1':'1-0','resign',false));}
+function newGameBtn(){confirmBox('↻',t('newQ'),t('newSub'),()=>playAgain());}
+function playAgain(){
+  if(G.mode==='bot')startGame({mode:'bot',my:G.my,level:G.level});
+  else if(G.mode==='local')startLocal();
+  else if(G.mode==='online'&&FB.ref){FB.ref.child('rematch/'+ME).set(true);$('rAgain').disabled=true;$('rAgain').textContent=t('waitingOpp');}
+}
+function askExitGame(){
+  if(G.mode==='online'&&!G.over)confirmBox('🚪',t('leave'),t('leaveOn'),()=>{endGame(G.my==='w'?'0-1':'1-0','resign',false);exitGame();});
+  else if(!G.over&&hist.length)confirmBox('🚪',t('leave'),t('leaveBot'),exitGame);
+  else confirmBox('🚪',t('leave'),t('leaveMenu'),exitGame);
+}
+function exitGame(){G.exited=true;closeModal('mResult');G.over=true;if(G.mode==='online'){leaveRoom();show('online');}else show(G.mode==='bot'?'botSetup':'home');}
+
+function capsFor(color){
+  const start={p:8,n:2,b:2,r:2,q:1},cnt={p:0,n:0,b:0,r:0,q:0};
+  for(const p of B)if(p&&(isW(p)?'w':'b')===color&&p.toLowerCase()!=='k')cnt[p.toLowerCase()]++;
+  let out='',val=0;
+  for(const x of ['q','r','b','n','p']){const miss=Math.max(0,start[x]-cnt[x]);for(let i=0;i<miss;i++)out+=GLY[x]+'︎';val+=miss*PV[x];}
+  return {out,val};
+}
+function pbar(color){
+  let name,tag='';
+  if(G.mode==='bot'){name=color===G.my?t('you'):t('bot')+' '+t(LVKEY[G.level]); if(color!==G.my&&G.thinking)tag=t('thinking');}
+  else if(G.mode==='online'){name=color===G.my?(G.myName+' ('+t('you')+')'):(G.oppName||t('opp'));}
+  else name=color==='w'?t('white'):t('black');
+  const other=color==='w'?'b':'w';
+  const mine=capsFor(other),theirs=capsFor(color);
+  const adv=Math.round((mine.val-theirs.val)/100);
+  const dot=G.mode==='online'&&color!==G.my?`<span class="dot ${G.oppOnline?'':'off'}"></span>`:'';
+  return `<div class="av ${color} sym">♚︎</div><div class="pinfo"><div class="pname">${dot}${esc(name)} <span class="ptag">${tag}</span></div>
+    <div class="caps sym">${mine.out}${adv>0?`<em>+${adv}</em>`:''}</div></div>`;
+}
+function render(){
+  if(!G.mode)return;
+  const chkSq=inCheck(turn)?kpos[turn]:-1;
+  const last=hist.length?hist[hist.length-1].m:null;
+  const tg=G.sel>=0?G.legal.filter(m=>m.f===G.sel):[];
+  const tset=S.moves?new Set(tg.map(m=>m.t)):new Set();
+  let h='';
+  for(let v=0;v<64;v++){
+    const i=G.flip?63-v:v,r=i>>3,c=i&7,p=B[i];
+    let cls='sq '+((r+c)%2?'d':'l');
+    if(last&&(last.f===i||last.t===i))cls+=' last';
+    if(i===G.sel)cls+=' sel';
+    if(i===chkSq)cls+=' chk';
+    h+=`<div class="${cls}" data-i="${i}">`;
+    if(v%8===0)h+=`<span class="co r">${8-r}</span>`;
+    if(v>=56)h+=`<span class="co f">${FILES[c]}</span>`;
+    if(tset.has(i))h+=p||(tg.find(m=>m.t===i&&m.ep))?'<span class="cap"></span>':'<span class="mv"></span>';
+    if(p)h+=pcHTML(p,i===G.lastPop?'pop':'');
+    h+='</div>';
+  }
+  $('board').innerHTML=h; G.lastPop=-1;
+  const topC=G.flip?'w':'b',botC=G.flip?'b':'w';
+  $('pTop').innerHTML=pbar(topC);$('pBot').innerHTML=pbar(botC);
+  $('pTop').classList.toggle('turn',!G.over&&turn===topC);$('pBot').classList.toggle('turn',!G.over&&turn===botC);
+  let st='';const chk=chkSq>=0?' — CHECK!':'';
+  if(G.over)st=G.result==='1/2'?t('drawn'):t('ended');
+  else if(G.thinking)st=G.mode==='bot'&&turn!==G.my?t('botThinking'):t('calc');
+  else if(G.mode==='local')st=(turn==='w'?t('whiteTurn'):t('blackTurn'))+chk;
+  else st=(turn===G.my?t('yourTurn'):t('oppTurn'))+chk;
+  if(G.mode==='online'&&!G.oppOnline&&!G.over)st=t('oppDisc')+'…';
+  $('status').textContent=st;
+  let ml='';for(let k=0;k<G.sanList.length;k+=2){ml+=`<span class="${k>=G.sanList.length-2?'cur':''}">${k/2+1}. ${G.sanList[k]} ${G.sanList[k+1]||''}</span>`;}
+  $('mlist').innerHTML=ml;$('mlist').scrollLeft=1e6;
+  $('bUndo').disabled=G.thinking||!hist.length;
+}
+
+/* ---------- ONLINE (Firebase Realtime Database) ---------- */
+const FB={db:null,ref:null,code:null,gameNo:0};
+function parseCfg(x){
+  x=(x||'').trim(); if(!x)return null;
+  let o=null; try{o=JSON.parse(x);}catch(e){}
+  if(!o){o={};const re=/(\w+)\s*:\s*["'`]([^"'`]+)["'`]/g;let m;while((m=re.exec(x)))o[m[1]]=m[2];}
+  return (o.apiKey&&o.databaseURL)?o:null;
+}
+function getCfg(){if(FIREBASE_CONFIG.apiKey&&FIREBASE_CONFIG.databaseURL)return FIREBASE_CONFIG;return store.get('fbcfg',null);}
+function saveCfg(){const c=parseCfg($('cfgText').value);if(!c){toast(t('cfgBad'));return;}store.set('fbcfg',c);toast(t('cfgSaved'));openOnline();}
+function resetCfg(){if(FIREBASE_CONFIG.apiKey){toast(t('cfgFixed'));return;}store.set('fbcfg',null);openOnline();}
+function openOnline(){
+  show('online');refreshSet();
+  const has=!!getCfg();
+  $('onlineSetup').style.display=has?'none':'';$('onlineMain').style.display=has?'':'none';
+  $('onMsg').textContent='';
+  if(has&&!store.get('name',''))askName();
+}
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('load '+src));document.head.appendChild(s);});}
+async function fbInit(){
+  if(!navigator.onLine){toast(t('offline'));return false;}
+  if(FB.db)return true;
+  const cfg=getCfg();if(!cfg)return false;
+  $('onMsg').textContent=t('connecting');
+  try{
+    if(!window.firebase){
+      await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
+      await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js');
+    }
+    firebase.initializeApp(cfg);FB.db=firebase.database();$('onMsg').textContent='';return true;
+  }catch(e){$('onMsg').textContent=t('noNet');return false;}
+}
+function needName(then){const n=store.get('name','');if(n)return n;askName(then);return null;}
+const rand4=()=>String(Math.floor(1000+Math.random()*9000));
+async function createRoom(pub){
+  const name=needName(()=>createRoom(pub));if(!name)return;if(!await fbInit())return;
+  $('onMsg').textContent=t('creating');
+  try{
+    for(let tries=0;tries<8;tries++){
+      const code=rand4();const ref=FB.db.ref('prochess_rooms/'+code);
+      const r=await ref.transaction(d=>{ if(d&&d.status!=='ended'&&Date.now()-(d.ts||0)<6*3600e3)return;
+        return {w:{id:ME,name},b:null,moves:'',status:'waiting',pub:!!pub,ts:Date.now(),game:0}; });
+      if(r.committed){enterRoom(code);$('onMsg').textContent='';return;}
+    }
+    $('onMsg').textContent=t('createFail');
+  }catch(e){$('onMsg').textContent=t('err')+': '+e.message;}
+}
+async function tryJoin(code,name){
+  const ref=FB.db.ref('prochess_rooms/'+code);let why='';
+  const r=await ref.transaction(d=>{
+    if(d===null)return null;
+    if(d.status!=='waiting'||d.b||!d.w||d.w.id===ME){why=d.w&&d.w.id===ME?'self':'full';return;}
+    if(Math.random()<.5){d.b={id:ME,name};}else{d.b=d.w;d.w={id:ME,name};}
+    d.status='playing';d.game=1;d.moves='';return d;});
+  const v=r.snapshot.val();
+  if(r.committed&&v&&(v.w&&v.w.id===ME||v.b&&v.b.id===ME)&&v.status==='playing')return 'ok';
+  return v?(why||'full'):'none';
+}
+function openJoin(){const name=needName(openJoin);if(!name)return;$('codeInp').value='';openModal('mJoin');}
+async function joinRoom(){
+  const name=store.get('name','');
+  const code=($('codeInp').value||'').trim();if(!/^\d{4}$/.test(code)){toast(t('enterCode'));return;}
+  if(!await fbInit())return;
+  toast(t('joining'));
+  try{const r=await tryJoin(code,name);
+    if(r==='ok'){closeModal('mJoin');enterRoom(code);}
+    else toast(r==='none'?t('noRoom').replace('{c}',code):r==='self'?t('selfRoom'):t('fullRoom'));
+  }catch(e){toast(t('err')+': '+e.message);}
+}
+async function quickMatch(){
+  const name=needName(quickMatch);if(!name)return;if(!await fbInit())return;
+  $('onMsg').textContent=t('searching');
+  try{
+    const snap=await FB.db.ref('prochess_rooms').orderByChild('status').equalTo('waiting').limitToLast(25).once('value');
+    const c=[];snap.forEach(ch=>{const v=ch.val();if(v&&v.pub&&v.w&&v.w.id!==ME&&Date.now()-(v.ts||0)<3*60e3)c.push(ch.key);});
+    c.reverse();
+    for(const code of c){const r=await tryJoin(code,name);if(r==='ok'){$('onMsg').textContent='';enterRoom(code);return;}}
+    await createRoom(true);
+  }catch(e){$('onMsg').textContent=t('err')+': '+e.message+' '+t('checkRules');}
+}
+function enterRoom(code){
+  FB.code=code;FB.gameNo=0;FB.ref=FB.db.ref('prochess_rooms/'+code);
+  const on=FB.ref.child('on/'+ME);on.set(true);on.onDisconnect().set(false);
+  FB.ref.on('value',s=>onRoom(s.val()));
+}
+function leaveRoom(){
+  if(!FB.ref)return;const ref=FB.ref;FB.ref=null;ref.off();
+  ref.child('on/'+ME).onDisconnect().cancel();
+  ref.once('value').then(s=>{const d=s.val();if(!d)return;if(d.status==='waiting'&&d.w&&d.w.id===ME)ref.remove();else ref.child('on/'+ME).set(false);});
+}
+function cancelWait(){leaveRoom();show('online');$('onMsg').textContent='';}
+function onRoom(d){
+  if(!FB.ref)return;
+  if(!d){leaveRoom();toast(t('roomClosed'));show('online');return;}
+  if(d.status==='waiting'){
+    $('waitCode').textContent=FB.code;
+    $('waitTxt').textContent=d.pub?t('searching'):t('yourCode');
+    $('waitSub').textContent=d.pub?t('seekSub'):t('shareCode');
+    show('wait');return;
+  }
+  const my=d.w&&d.w.id===ME?'w':d.b&&d.b.id===ME?'b':null;
+  if(!my){leaveRoom();toast(t('roomFull'));show('online');return;}
+  const opp=my==='w'?d.b:d.w;
+  if(d.game!==FB.gameNo){FB.gameNo=d.game;startGame({mode:'online',my,oppName:opp.name,oppId:opp.id,myName:store.get('name',t('you'))});
+    toast(t('youPlay').replace('{c}',(my==='w'?t('white'):t('black')).toUpperCase()));vib([40,40,40]);}
+  const arr=(d.moves||'').split(' ').filter(Boolean);
+  for(let i=G.uciList.length;i<arr.length;i++){const m=G.legal.find(x=>uci(x)===arr[i]);if(!m||G.over)break;commitMove(m);}
+  const wasOn=G.oppOnline;G.oppOnline=!(d.on&&d.on[opp.id]===false);
+  if(wasOn!==G.oppOnline){render();if(!G.oppOnline)toast(G.over?t('oppLeft'):t('oppDisc'));}
+  if(d.status==='ended'&&!G.over)endGame(d.result,d.reason,true);
+  const rm=d.rematch||{};
+  if(G.over&&rm[opp.id]&&!rm[ME])$('rExtra').textContent=t('wantsRematch').replace('{n}',opp.name||t('opp'));
+  if(G.over&&!G.oppOnline){$('rExtra').textContent=t('oppLeft');$('rAgain').disabled=true;}
+  if(rm[ME]&&rm[opp.id]&&my==='w'){
+    FB.ref.update({w:d.b,b:d.w,moves:'',status:'playing',result:null,reason:null,rematch:null,game:(d.game||1)+1});
+  }
+}
+function pushMove(){
+  if(!FB.ref)return;const n=G.uciList.length,full=G.uciList.join(' ');
+  FB.ref.child('moves').transaction(cur=>{const a=(cur||'').split(' ').filter(Boolean);if(a.length!==n-1)return;return full;})
+    .then(r=>{if(!r.committed)toast(t('sendFail'));}).catch(()=>toast(t('sendFail')));
+}
+
+/* ============ Butang Back (Android) ============ */
+function exitApp(){try{const A=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.App;if(A)return A.exitApp();}catch(e){}try{navigator.app&&navigator.app.exitApp();}catch(e){}window.close();}
+function askExit(){confirmBox('👋',t('exitApp'),t('exitSub'),exitApp);}
+function handleBack(){
+  const m=document.querySelector('.modal.show');
+  if(m){ if(m.id==='mPromo')return;
+    if(m.id==='mResult'){closeModal('mResult');return;}
+    closeModal(m.id);return; }
+  const sc=curScreen();
+  if(sc==='game'){askExitGame();return;}
+  if(sc==='wait'){confirmBox('⏳',t('cancelWait'),t('cancelWaitSub'),cancelWait);return;}
+  if(sc!=='home'){show('home');return;}
+  askExit();
+}
+(function(){let native=false;
+  try{const A=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.App;
+    if(A&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform()){A.addListener('backButton',handleBack);native=true;}}catch(e){}
+  document.addEventListener('backbutton',e=>{e.preventDefault();handleBack();},false);
+  if(!native){try{history.pushState({pc:1},'');addEventListener('popstate',()=>{history.pushState({pc:1},'');handleBack();});}catch(e){}}
+})();
+
+/* ============ Auto update (GitHub Releases) ============ */
+let updInfo=null;
+function verLabel(n){return '1.0.'+n;}
+async function checkUpdate(manual){
+  if(!APP_BUILD){if(manual)toast(t('updLatest'));return;}
+  try{const r=await fetch(`https://api.github.com/repos/${UPDATE_REPO}/releases/latest`,{cache:'no-store'});if(!r.ok)throw 0;const j=await r.json();
+    const n=parseInt(String(j.tag_name||'').split('.').pop())||0;const a=(j.assets||[]).find(x=>/\.apk$/i.test(x.name));
+    if(n>APP_BUILD&&a){updInfo={n,url:a.browser_download_url};$('updTxt').textContent=t('updBar').replace('{v}',verLabel(n));$('updBar').classList.add('on');
+      const skip=store.get('updSkip',0);if(manual||skip!==n)openUpdate();}
+    else{$('updBar').classList.remove('on');if(manual)toast(t('updLatest'));}
+  }catch(e){if(manual)toast(t('updFail'));}
+}
+function openUpdate(){if(!updInfo)return;$('updSub').textContent=t('updSub').replace('{v}',verLabel(updInfo.n));
+  $('updLater').onclick=()=>{store.set('updSkip',updInfo.n);closeModal('mUpd');};openModal('mUpd');}
+function doUpdate(){if(!updInfo)return;closeModal('mUpd');toast(t('updDl'));
+  setTimeout(()=>{try{const isNative=window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform();if(isNative)location.href=updInfo.url;else window.open(updInfo.url,'_blank');}catch(e){location.href=updInfo.url;}},400);}
+
+/* ============ Boot ============ */
+document.querySelectorAll('.verTxt').forEach(e=>e.textContent=APP_BUILD?verLabel(APP_BUILD):'1.0 (dev)');
+applyLang();buildKBs();renderLevels();refreshSet();
+if(!store.get('name',''))setTimeout(()=>askName(),600);
+setTimeout(()=>checkUpdate(false),2500);
+</script>
+</body>
+</html>
