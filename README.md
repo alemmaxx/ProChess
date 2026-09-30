@@ -1,28 +1,40 @@
 # ProChess by ProKuiz ♞
 
-App catur: **Lawan Bot** (Mudah / Sederhana / Sukar), **Lawan Online** (Firebase) dan **2 Pemain** atas satu phone.
-BM | EN · keyboard dalam app · butang back Android · auto update.
+Catur premium — **Lawan Bot** (Mudah / Sederhana / Sukar), **Lawan Online 1v1** dengan rating & ranking, **2 Pemain** atas satu phone.
+Konsep sama macam ProSudoku: APK buka versi live di GitHub Pages → **kemas kini automatik tanpa download APK baru**.
 
-## Sebelum upload
-1. **Nama repo** — `index.html` → `const UPDATE_REPO = 'alemmaxx/ProChess'`. Tukar kalau nama repo lain.
-2. **Firebase** — isi `FIREBASE_CONFIG` dalam `index.html` (lihat `CARA-SETUP-ONLINE.md`).
+## Ciri
+- BM | EN, keyboard dalam app, butang back Android + pop up keluar
+- Profil pemain (nama, rating ⭐, rekod M-K-S) · Ranking (Rating / Menang / Main) + padam ranking guna password admin
+- Online: senarai pemain online + **Ajak lawan**, Cari Lawan Rawak (bot ganti lepas 25 saat), Bilik kod 5 huruf, Main Lagi (warna bertukar)
+- Lawan bot disimpan automatik → **Sambung Permainan**
+- PWA (iPhone: Add to Home Screen), halaman offline, service worker
 
-## Setup repo (sekali sahaja)
-1. Upload semua fail (termasuk folder `.github`) ke repo baru, branch `main`. Repo mesti **Public** supaya auto update boleh baca release.
-2. **Settings → Secrets and variables → Actions → New repository secret**
-   - Name: `KEYSTORE_BASE64`
-   - Value: isi fail `KEYSTORE_BASE64.txt` (sama macam ProSudoku)
-   → supaya update APK tak perlu uninstall.
-3. Tab **Actions** → **Build ProChess APK** jalan sendiri.
+## Setup (sekali sahaja)
+1. **Repo GitHub `alemmaxx/ProChess`** (Public) → upload semua fail ini ke branch `main` (termasuk `.github`, `.nojekyll`).
+2. **GitHub Pages**: Settings → Pages → *Deploy from a branch* → `main` / `(root)` → Save.
+   App akan hidup di `https://alemmaxx.github.io/ProChess/`
+3. **Secret** `KEYSTORE_BASE64` (Settings → Secrets and variables → Actions) — isi sama macam ProSudoku.
+4. **Firebase** (projek `prokuiz-aplikasi-b518a`, sama dengan ProSudoku):
+   - Authentication → Anonymous → **Enable** (sepatutnya dah on untuk ProSudoku)
+   - **Firestore Database → Rules** → ganti dengan isi fail `firestore.rules` → **Publish**
+     (fail ini = rules ProSudoku sedia ada + blok ProChess; ProSudoku tak terjejas)
+5. Tab **Actions** → build siap → **Releases** → muat turun `ProChess.apk` → pasang.
 
-## Dapatkan APK
-Tab **Releases** → versi terbaru (cth `v1.0.1`) → muat turun `ProChess.apk`.
-Setiap kali push ke `main`, versi baru dibina dan app pengguna akan tunjuk pop up **Kemas Kini**.
+## Kemas kini app selepas ini
+1. Edit `index.html` → **naikkan `APP_VERSION`** (cth `'1.0.0'` → `'1.0.1'`).
+2. Push ke `main`. Dalam beberapa minit, app pengguna tunjuk bar **Kemas Kini** berkelip → tekan → siap.
+   APK baru hanya perlu kalau tukar `capacitor.config.json` / ikon / plugin.
+
+## Password admin padam ranking
+Sama dengan ProSudoku (`adminPassword()` dalam `firestore.rules`). ProChess guna dokumen `config/chess`, jadi padam ranking ProChess tak kacau ranking ProSudoku.
 
 ## Struktur
 | Fail | Fungsi |
 |---|---|
 | `index.html` | Seluruh app |
-| `assets/` | Ikon & splash screen |
-| `capacitor.config.json` | ID app `com.prokuiz.chess` |
-| `.github/workflows/build-apk.yml` | Build APK + terbit release |
+| `sw.js`, `manifest.webmanifest`, `icons/` | PWA / iPhone / cache offline |
+| `offline.html` | Skrin "Tiada Internet" dalam APK |
+| `capacitor.config.json` | APK buka `https://alemmaxx.github.io/ProChess/` |
+| `firestore.rules` | Rules gabungan ProSudoku + ProChess |
+| `.github/workflows/build-apk.yml` | Build APK + release |

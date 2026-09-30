@@ -2,5 +2,10 @@
   "appId": "com.prokuiz.chess",
   "appName": "ProChess",
   "webDir": "www",
+  "server": {
+    "url": "https://alemmaxx.github.io/ProChess/",
+    "allowNavigation": ["alemmaxx.github.io"],
+    "errorPath": "offline.html"
+  },
   "android": { "backgroundColor": "#0d1424" }
 }
